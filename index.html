@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>용문중 급식 식단, 학교 시간표</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        header {
+            text-align: center;
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex; /* Flexbox를 사용하여 가로 배치 */
+            justify-content: space-between; /* 양쪽 끝으로 정렬 */
+        }
+        section {
+            background: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 10px; /* 좌우 간격 */
+            flex: 1; /* 동일한 비율로 공간 차지 */
+            min-width: 300px; /* 최소 너비 설정 */
+        }
+        h2 {
+            margin-top: 0;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: black; /* 추가 버튼 색상 */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #333; /* 버튼 호버 시 색상 변경 */
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li button {
+            background-color: red; /* 삭제 버튼 색상 */
+            padding: 5px 10px;
+        }
+        li button:hover {
+            background-color: darkred; /* 삭제 버튼 호버 시 색상 변경 */
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>용문중 급식 식단, 학교 시간표</h1>
+    </header>
+    <main>
+        <div class="container">
+            <section id="meal-schedule">
+                <h2>급식 추가</h2>
+                <form id="meal-form">
+                    <input type="text" id="meal-title" placeholder="급식 항목" required>
+                    <button type="submit">추가</button>
+                </form>
+                <h3>급식 목록</h3>
+                <ul id="meals"></ul>
+            </section>
+            
+            <section id="timetable">
+                <h2>시간표 추가</h2>
+                <form id="class-form">
+                    <input type="text" id="class-title" placeholder="시간표 항목" required>
+                    <button type="submit">추가</button>
+                </form>
+                <h3>시간표 목록</h3>
+                <ul id="classes"></ul>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>© 2024 용문중 일정 관리</p>
+    </footer>
+    <script>
+        function loadMeals() {
+            const meals = JSON.parse(localStorage.getItem('meals')) || [];
+            meals.forEach(meal => {
+                addMealToList(meal);
+            });
+        }
+
+        function loadClasses() {
+            const classes = JSON.parse(localStorage.getItem('classes')) || [];
+            classes.forEach(classItem => {
+                addClassToList(classItem);
+            });
+        }
+
+        function addMealToList(meal) {
+            const mealList = document.getElementById('meals');
+            const li = document.createElement('li');
+            li.textContent = meal;
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '삭제';
+            deleteButton.onclick = function() {
+                removeMeal(meal, li);
+            };
+            li.appendChild(deleteButton);
+            mealList.appendChild(li);
+        }
+
+        function addClassToList(classItem) {
+            const classList = document.getElementById('classes');
+            const li = document.createElement('li');
+            li.textContent = classItem;
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '삭제';
+            deleteButton.onclick = function() {
+                removeClass(classItem, li);
+            };
+            li.appendChild(deleteButton);
+            classList.appendChild(li);
+        }
+
+        const mealForm = document.getElementById('meal-form');
+        mealForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const mealTitle = document.getElementById('meal-title').value;
+            addMealToList(mealTitle);
+            saveToLocalStorage('meals', mealTitle);
+            mealForm.reset();
+        });
+
+        const classForm = document.getElementById('class-form');
+        classForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const classTitle = document.getElementById('class-title').value;
+            addClassToList(classTitle);
+            saveToLocalStorage('classes', classTitle);
+            classForm.reset();
+        });
+
+        function saveToLocalStorage(key, value) {
+            const currentData = JSON.parse(localStorage.getItem(key)) || [];
+            currentData.push(value);
+            localStorage.setItem(key, JSON.stringify(currentData));
+        }
+
+        function removeMeal(meal, li) {
+            const currentData = JSON.parse(localStorage.getItem('meals')) || [];
+            const updatedData = currentData.filter(item => item !== meal);
+            localStorage.setItem('meals', JSON.stringify(updatedData));
+            li.remove();
+        }
+
+        function removeClass(classItem, li) {
+            const currentData = JSON.parse(localStorage.getItem('classes')) || [];
+            const updatedData = currentData.filter(item => item !== classItem);
+            localStorage.setItem('classes', JSON.stringify(updatedData));
+            li.remove();
+        }
+
+        loadMeals();
+        loadClasses();
+    </script>
+</body>
+</html>
