@@ -11,31 +11,28 @@
             margin: 20px;
             background-color: #f4f4f4;
         }
-        header {
+        header, footer {
             text-align: center;
             background-color: #007BFF;
             color: white;
             padding: 20px;
             border-radius: 5px;
-            margin-bottom: 20px;
         }
         .container {
-            display: flex; /* Flexbox를 사용하여 가로 배치 */
-            justify-content: space-between; /* 양쪽 끝으로 정렬 */
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
         section {
             background: #ffffff;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin: 0 10px; /* 좌우 간격 */
-            flex: 1; /* 동일한 비율로 공간 차지 */
-            min-width: 300px; /* 최소 너비 설정 */
+            margin: 0 10px;
+            flex: 1;
+            min-width: 300px;
         }
-        h2 {
-            margin-top: 0;
-        }
-        input[type="text"] {
+        input[type="text"], input[type="date"] {
             width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
@@ -43,7 +40,7 @@
             border-radius: 4px;
         }
         button {
-            background-color: black; /* 추가 버튼 색상 */
+            background-color: black;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -52,7 +49,11 @@
             transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #333; /* 버튼 호버 시 색상 변경 */
+            background-color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
         }
         li {
             padding: 10px;
@@ -61,36 +62,23 @@
             justify-content: space-between;
             align-items: center;
         }
-        li button {
-            background-color: red; /* 삭제 버튼 색상 */
-            padding: 5px 10px;
-        }
-        li button:hover {
-            background-color: darkred; /* 삭제 버튼 호버 시 색상 변경 */
-        }
         footer {
-            text-align: center;
             margin-top: 20px;
             color: #777;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>용문중 급식 식단, 학교 시간표</h1>
+        <h1>용문중 도우미 사이트</h1>
     </header>
     <main>
         <div class="container">
-            <section id="meal-schedule">
-                <h2>급식 추가</h2>
-                <form id="meal-form">
-                    <input type="text" id="meal-title" placeholder="급식 항목" required>
-                    <button type="submit">추가</button>
-                </form>
-                <h3>급식 목록</h3>
-                <ul id="meals"></ul>
-            </section>
-            
             <section id="timetable">
                 <h2>시간표 추가</h2>
                 <form id="class-form">
@@ -100,19 +88,44 @@
                 <h3>시간표 목록</h3>
                 <ul id="classes"></ul>
             </section>
+
+            <section id="homework">
+                <h2>과제 관리</h2>
+                <form id="homework-form">
+                    <input type="text" id="homework-title" placeholder="과제 항목" required>
+                    <button type="submit">추가</button>
+                </form>
+                <h3>과제 목록</h3>
+                <ul id="homeworks"></ul>
+            </section>
+
+            <section id="exam-schedule">
+                <h2>시험 일정</h2>
+                <form id="exam-form">
+                    <input type="text" id="exam-title" placeholder="시험 과목" required>
+                    <input type="date" id="exam-date" required>
+                    <button type="submit">추가</button>
+                </form>
+                <h3>시험 목록</h3>
+                <ul id="exams"></ul>
+            </section>
         </div>
+
+        <section id="announcements">
+            <h2>학교 일정</h2>
+            <iframe src="https://yongmoon.sen.ms.kr/16447/subMenu.do"></iframe>
+        </section>
+
+        <section id="external-site">
+            <h2>용문중 급식</h2>
+            <iframe src="https://yongmoon.sen.ms.kr/16446/subMenu.do" width="100%" height="800" style="border: none;"></iframe>
+        </section>
     </main>
     <footer>
         <p>© 2024 용문중 일정 관리</p>
     </footer>
     <script>
-        function loadMeals() {
-            const meals = JSON.parse(localStorage.getItem('meals')) || [];
-            meals.forEach(meal => {
-                addMealToList(meal);
-            });
-        }
-
+        // 시간표 관리
         function loadClasses() {
             const classes = JSON.parse(localStorage.getItem('classes')) || [];
             classes.forEach(classItem => {
@@ -120,40 +133,20 @@
             });
         }
 
-        function addMealToList(meal) {
-            const mealList = document.getElementById('meals');
-            const li = document.createElement('li');
-            li.textContent = meal;
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = '삭제';
-            deleteButton.onclick = function() {
-                removeMeal(meal, li);
-            };
-            li.appendChild(deleteButton);
-            mealList.appendChild(li);
-        }
-
         function addClassToList(classItem) {
             const classList = document.getElementById('classes');
             const li = document.createElement('li');
             li.textContent = classItem;
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = '삭제';
             deleteButton.onclick = function() {
                 removeClass(classItem, li);
             };
+
             li.appendChild(deleteButton);
             classList.appendChild(li);
         }
-
-        const mealForm = document.getElementById('meal-form');
-        mealForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const mealTitle = document.getElementById('meal-title').value;
-            addMealToList(mealTitle);
-            saveToLocalStorage('meals', mealTitle);
-            mealForm.reset();
-        });
 
         const classForm = document.getElementById('class-form');
         classForm.addEventListener('submit', function(event) {
@@ -164,19 +157,6 @@
             classForm.reset();
         });
 
-        function saveToLocalStorage(key, value) {
-            const currentData = JSON.parse(localStorage.getItem(key)) || [];
-            currentData.push(value);
-            localStorage.setItem(key, JSON.stringify(currentData));
-        }
-
-        function removeMeal(meal, li) {
-            const currentData = JSON.parse(localStorage.getItem('meals')) || [];
-            const updatedData = currentData.filter(item => item !== meal);
-            localStorage.setItem('meals', JSON.stringify(updatedData));
-            li.remove();
-        }
-
         function removeClass(classItem, li) {
             const currentData = JSON.parse(localStorage.getItem('classes')) || [];
             const updatedData = currentData.filter(item => item !== classItem);
@@ -184,8 +164,95 @@
             li.remove();
         }
 
-        loadMeals();
+        // 과제 관리
+        function loadHomeworks() {
+            const homeworks = JSON.parse(localStorage.getItem('homeworks')) || [];
+            homeworks.forEach(homework => {
+                addHomeworkToList(homework);
+            });
+        }
+
+        function addHomeworkToList(homework) {
+            const homeworkList = document.getElementById('homeworks');
+            const li = document.createElement('li');
+            li.textContent = homework;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '삭제';
+            deleteButton.onclick = function() {
+                removeHomework(homework, li);
+            };
+
+            li.appendChild(deleteButton);
+            homeworkList.appendChild(li);
+        }
+
+        const homeworkForm = document.getElementById('homework-form');
+        homeworkForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const homeworkTitle = document.getElementById('homework-title').value;
+            addHomeworkToList(homeworkTitle);
+            saveToLocalStorage('homeworks', homeworkTitle);
+            homeworkForm.reset();
+        });
+
+        function removeHomework(homework, li) {
+            const currentData = JSON.parse(localStorage.getItem('homeworks')) || [];
+            const updatedData = currentData.filter(item => item !== homework);
+            localStorage.setItem('homeworks', JSON.stringify(updatedData));
+            li.remove();
+        }
+
+        // 시험 일정 관리
+        function loadExams() {
+            const exams = JSON.parse(localStorage.getItem('exams')) || [];
+            exams.forEach(exam => {
+                addExamToList(exam);
+            });
+        }
+
+        function addExamToList(exam) {
+            const examList = document.getElementById('exams');
+            const li = document.createElement('li');
+            li.textContent = exam;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '삭제';
+            deleteButton.onclick = function() {
+                removeExam(exam, li);
+            };
+
+            li.appendChild(deleteButton);
+            examList.appendChild(li);
+        }
+
+        const examForm = document.getElementById('exam-form');
+        examForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const examTitle = document.getElementById('exam-title').value;
+            const examDate = document.getElementById('exam-date').value;
+            addExamToList(`${examTitle} - ${examDate}`);
+            saveToLocalStorage('exams', `${examTitle} - ${examDate}`);
+            examForm.reset();
+        });
+
+        function removeExam(exam, li) {
+            const currentData = JSON.parse(localStorage.getItem('exams')) || [];
+            const updatedData = currentData.filter(item => item !== exam);
+            localStorage.setItem('exams', JSON.stringify(updatedData));
+            li.remove();
+        }
+
+        function saveToLocalStorage(key, value) {
+            const currentData = JSON.parse(localStorage.getItem(key)) || [];
+            currentData.push(value);
+            localStorage.setItem(key, JSON.stringify(currentData));
+        }
+
+        // 페이지 로드 시 데이터 불러오기
         loadClasses();
+        loadHomeworks();
+        loadExams();
     </script>
 </body>
 </html>
